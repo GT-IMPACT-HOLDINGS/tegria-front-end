@@ -20,7 +20,7 @@ RUN npm install
 # Step 6: Use a non-root user for security
 USER node
 
-# 6. Inform Docker which port the app listens on at runtime
+# 6. Inform Docker which port the app listens on at runtime (5173)
 EXPOSE 5173
 
 # 7. Define the command to start your application
