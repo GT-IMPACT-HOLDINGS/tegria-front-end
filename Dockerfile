@@ -17,6 +17,9 @@ COPY . .
 #RUN npm install --only=production
 RUN npm install 
 
+# Change ownership of the /app folder to the 'node' user
+RUN chown -R node:node /app
+
 # Step 6: Use a non-root user for security
 USER node
 
