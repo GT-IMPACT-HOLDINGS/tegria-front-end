@@ -24,5 +24,5 @@ USER node
 EXPOSE 5173
 
 # 7. Define the command to start your application
-#CMD ["npm", "start"]
+##CMD ["npm", "start"]
 CMD ["sh", "-c", "npm run dev"]
