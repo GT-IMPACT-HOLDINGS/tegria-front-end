@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef } from "react";
 import { LinkIcon, MoreIcon } from "../icons";
-import { pages } from "../../data/pages";
+import type { PageData } from "../../data/pages";
 
 interface DocumentViewProps {
   pageId: string;
+  pages: Record<string, PageData>;
   scrollToAnchor?: string | null;
 }
 
@@ -15,14 +16,18 @@ function loadBlock(pageId: string, blockId: string, fallback: string): string {
   try {
     const saved = localStorage.getItem(storageKey(pageId, blockId));
     if (saved !== null) return saved;
-  } catch {}
+  } catch {
+    /* ignore */
+  }
   return fallback;
 }
 
 function saveBlock(pageId: string, blockId: string, value: string) {
   try {
     localStorage.setItem(storageKey(pageId, blockId), value);
-  } catch {}
+  } catch {
+    /* ignore */
+  }
 }
 
 function EditableBlock({
@@ -59,7 +64,7 @@ function EditableBlock({
   );
 }
 
-export function DocumentView({ pageId, scrollToAnchor }: DocumentViewProps) {
+export function DocumentView({ pageId, pages, scrollToAnchor }: DocumentViewProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const page = pages[pageId];
 
@@ -72,36 +77,52 @@ export function DocumentView({ pageId, scrollToAnchor }: DocumentViewProps) {
     }
   }, [scrollToAnchor]);
 
-  if (!page) return null;
+  if (!page) {
+    return (
+      <div className="bg-bg-surface rounded-2xl flex flex-col h-full overflow-hidden items-center justify-center text-text-muted text-sm px-8 text-center">
+        Empty document pane. Propose an OSNG from Ask Anything to begin.
+      </div>
+    );
+  }
 
   return (
     <div className="bg-bg-surface rounded-2xl flex flex-col h-full overflow-hidden">
-      {/* Breadcrumb header */}
       <div className="flex items-center justify-between p-4 h-[76px]">
         <div className="flex items-center gap-2 text-base font-medium overflow-hidden">
           {page.breadcrumb.map((crumb, i) => (
             <span key={i} className="flex items-center gap-2">
               {i > 0 && <span className="text-text-breadcrumb">/</span>}
-              <span className={i === page.breadcrumb.length - 1 ? "text-text-white" : "text-text-breadcrumb"}>
+              <span
+                className={
+                  i === page.breadcrumb.length - 1 ? "text-text-white" : "text-text-breadcrumb"
+                }
+              >
                 {crumb}
               </span>
             </span>
           ))}
         </div>
         <div className="flex items-center gap-1">
-          <button className="flex items-center justify-center size-10 text-text-muted hover:text-text-primary">
+          <button
+            type="button"
+            className="flex items-center justify-center size-10 text-text-muted hover:text-text-primary"
+          >
             <LinkIcon size={24} />
           </button>
-          <button className="flex items-center justify-center size-10 text-text-muted hover:text-text-primary">
+          <button
+            type="button"
+            className="flex items-center justify-center size-10 text-text-muted hover:text-text-primary"
+          >
             <MoreIcon size={24} />
           </button>
         </div>
       </div>
 
-      {/* Document content */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-10 xl:px-[100px] 2xl:px-[156px] py-[100px]">
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto px-10 xl:px-[100px] 2xl:px-[156px] py-[100px]"
+      >
         <div className="max-w-[740px] flex flex-col gap-11" key={pageId}>
-          {/* Title */}
           <div className="flex items-center gap-3.5 overflow-hidden">
             <span className="text-3xl">{page.emoji}</span>
             <EditableBlock
@@ -121,9 +142,12 @@ export function DocumentView({ pageId, scrollToAnchor }: DocumentViewProps) {
             className="text-text-primary font-bold text-2xl"
           />
 
-          {/* Sections */}
           {page.sections.map((section, si) => (
-            <div key={si} className="flex flex-col gap-2.5" {...(section.anchorId ? { "data-anchor": section.anchorId } : {})}>
+            <div
+              key={si}
+              className="flex flex-col gap-2.5"
+              {...(section.anchorId ? { "data-anchor": section.anchorId } : {})}
+            >
               <EditableBlock
                 pageId={pageId}
                 blockId={`s${si}-heading`}
