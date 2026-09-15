@@ -28,4 +28,4 @@ EXPOSE 5173
 
 # 7. Define the command to start your application
 #CMD ["npm", "start"]
-CMD ["sh", "-c", "npm run dev"]
+CMD ["sh", "-c", "npm run dev --host 0.0.0.0 --port 10000"]
