@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "Ogun" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "Ogun" ]
+    branches: [ "main" ]
     
 jobs:
   build:
@@ -45,7 +45,7 @@ jobs:
         file: ./Dockerfile
         push: true
         # The tag below formats to lower case which GHCR requires
-        tags: ghcr.io/${{ env.REPO_LOWER }}/gtih-image:latest
+        tags: ghcr.io/${{ env.REPO_LOWER }}/tgfe-image:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -68,13 +68,14 @@ jobs:
   #      name: docker-image-artifact
   #      path: gtih-image.tar
 
+
 # deploy to Render
-  deploy:
-           needs: build
-           runs-on: ubuntu-latest
-           if: github.ref == 'refs/heads/Ogun' && github.event_name == 'push'
-    
-           steps:
-           - name: Trigger Render Deployment
-             run: |
-              curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+#  deploy:
+#           needs: build
+#           runs-on: ubuntu-latest
+#           if: github.ref == 'refs/heads/Ogun' && github.event_name == 'push'
+#    
+#           steps:
+#           - name: Trigger Render Deployment
+#             run: |
+#              curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
