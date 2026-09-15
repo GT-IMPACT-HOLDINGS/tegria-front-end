@@ -1,35 +1,22 @@
-import { FolderIcon, CopyIcon } from "../icons";
+import { PlusIcon, CopyIcon } from "../icons";
 import { StatusIndicator } from "../ui/StatusIndicator";
-
-interface TreeItem {
-  id: string;
-  label: string;
-  type: "folder" | "file" | "task";
-  status?: "draft" | "ready" | "approved";
-  depth: number;
-  parentId?: string;
-}
-
-export const treeData: TreeItem[] = [
-  { id: "1", label: "Checkout", type: "folder", status: "draft", depth: 0 },
-  { id: "2", label: "brief.md", type: "file", depth: 1, parentId: "1" },
-  { id: "3", label: "prd.md", type: "file", depth: 1, parentId: "1" },
-  { id: "4", label: "architecture.md", type: "file", depth: 1, parentId: "1" },
-  { id: "5", label: "Apply discount code", type: "task", status: "ready", depth: 1, parentId: "1" },
-  { id: "6", label: "story.md", type: "file", depth: 2, parentId: "5" },
-  { id: "7", label: "criteria.md", type: "file", depth: 2, parentId: "5" },
-  { id: "8", label: "Save payment method", type: "task", status: "approved", depth: 1, parentId: "1" },
-  { id: "9", label: "Accounts", type: "folder", status: "draft", depth: 0 },
-  { id: "10", label: "Billing", type: "folder", status: "draft", depth: 0 },
-];
+import type { TreeItem } from "../../data/pages";
 
 interface SidebarProps {
+  treeData: TreeItem[];
   activeItemId: string;
   onItemClick: (id: string) => void;
   onAnchorClick: (pageId: string, anchorId: string) => void;
+  onCreateVolume?: () => void;
 }
 
-export function Sidebar({ activeItemId, onItemClick, onAnchorClick }: SidebarProps) {
+export function Sidebar({
+  treeData,
+  activeItemId,
+  onItemClick,
+  onAnchorClick,
+  onCreateVolume,
+}: SidebarProps) {
   function handleClick(item: TreeItem) {
     if (item.type === "file") {
       const parentId = item.parentId ?? "";
@@ -41,19 +28,30 @@ export function Sidebar({ activeItemId, onItemClick, onAnchorClick }: SidebarPro
 
   return (
     <aside className="w-[var(--sidebar-width)] h-full flex flex-col">
-      {/* Space header */}
       <div className="flex items-center justify-between px-4 py-5 h-20">
-        <div className="flex items-center gap-2">
-          <FolderIcon size={24} className="text-text-white" />
-          <span className="text-text-white font-medium text-base">Space 1</span>
-        </div>
-        <button className="flex items-center justify-center size-10 text-text-muted hover:text-text-primary">
+        <button
+          type="button"
+          onClick={() => onCreateVolume?.()}
+          title="create a new volume"
+          aria-label="create a new volume"
+          className="flex items-center justify-center size-10 rounded-lg text-text-white hover:bg-bg-surface-hover hover:text-text-primary"
+        >
+          <PlusIcon size={24} />
+        </button>
+        <button
+          type="button"
+          className="flex items-center justify-center size-10 text-text-muted hover:text-text-primary"
+        >
           <CopyIcon size={24} />
         </button>
       </div>
 
-      {/* Tree */}
       <nav className="flex flex-col overflow-y-auto relative">
+        {treeData.length === 0 ? (
+          <p className="px-4 py-3 text-text-muted text-sm">
+            Empty garden — create a volume, then Ask Anything to propose a single-OSN OSNG.
+          </p>
+        ) : null}
         {treeData.map((item, index) => {
           const hasChildrenBelow = treeData
             .slice(index + 1)
@@ -70,7 +68,10 @@ export function Sidebar({ activeItemId, onItemClick, onAnchorClick }: SidebarPro
               >
                 <div
                   className="absolute top-1/2 h-px bg-border-tree"
-                  style={{ left: item.depth === 2 ? 53 : 28, width: item.depth === 2 ? 12 : 37 }}
+                  style={{
+                    left: item.depth === 2 ? 53 : 28,
+                    width: item.depth === 2 ? 12 : 37,
+                  }}
                 />
                 <div
                   className="absolute bg-border-tree"
@@ -97,6 +98,11 @@ export function Sidebar({ activeItemId, onItemClick, onAnchorClick }: SidebarPro
                 isActive ? "bg-bg-active" : ""
               }`}
               style={{ paddingLeft }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") handleClick(item);
+              }}
             >
               {isActive && (
                 <div className="absolute left-0 top-[7px] bottom-[7px] w-[3px] rounded-r-sm bg-status-ready" />
@@ -134,9 +140,7 @@ export function Sidebar({ activeItemId, onItemClick, onAnchorClick }: SidebarPro
               )}
 
               <StatusIndicator status={item.status ?? "draft"} size={16} />
-              <span className="text-text-white font-medium text-sm">
-                {item.label}
-              </span>
+              <span className="text-text-white font-medium text-sm">{item.label}</span>
             </div>
           );
         })}
