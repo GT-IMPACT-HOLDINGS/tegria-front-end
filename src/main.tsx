@@ -18,6 +18,6 @@ boot().catch((err) => {
   const root = document.getElementById('root')
   if (root) {
     root.textContent =
-      'Failed to load GTIH SDK. Flip DEPLOY_TARGET in src/deployTarget.ts (dev|prod) or check the GTIH host is reachable.'
+      'Failed to load GTIH SDK. Set DEPLOY_TARGET (dev|prod) or GTIH_SDK_URL in the environment, or check the GTIH host is reachable.'
   }
 })

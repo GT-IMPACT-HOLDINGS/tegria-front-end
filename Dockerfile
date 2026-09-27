@@ -17,6 +17,12 @@ COPY . .
 #RUN npm install --only=production
 RUN npm install 
 
+# GTIH SDK location: bake defaults with --build-arg, override per container with -e.
+ARG DEPLOY_TARGET=dev
+ARG GTIH_SDK_URL=
+ENV DEPLOY_TARGET=$DEPLOY_TARGET
+ENV GTIH_SDK_URL=$GTIH_SDK_URL
+
 # Change ownership of the /app folder to the 'node' user
 RUN chown -R node:node /app
 

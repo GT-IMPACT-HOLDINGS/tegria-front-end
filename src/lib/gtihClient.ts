@@ -1,7 +1,7 @@
 /**
  * Thin Tegria facade over the GTIH SDK.
  * Connectivity (host, port, paths, CA module) lives only in gtih-sdk.js.
- * Which GTIH host is chosen via DEPLOY_TARGET in src/deployTarget.ts.
+ * Which GTIH host is chosen via DEPLOY_TARGET / GTIH_SDK_URL env vars resolved in src/deployTarget.ts.
  */
 
 import { resolveGtihSdkUrl } from "../deployTarget";

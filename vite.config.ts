@@ -5,7 +5,7 @@ import { defineConfig } from "vite";
 
 /**
  * Tegria talks to GTIH only via gtih-sdk.js.
- * Flip DEPLOY_TARGET in src/deployTarget.ts (and server.js) for prod.
+ * DEPLOY_TARGET / GTIH_SDK_URL come from the environment (see src/deployTarget.ts).
  * COOP/COEP remain so browser Hanuman (SharedArrayBuffer) can run on this origin.
  */
 const isolationHeaders = {
@@ -16,6 +16,8 @@ const isolationHeaders = {
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  // Only these names (plus VITE_*) are exposed to browser code — keep them exact.
+  envPrefix: ["VITE_", "DEPLOY_TARGET", "GTIH_SDK_URL"],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -23,15 +25,11 @@ export default defineConfig({
   },
   server: {
     headers: { ...isolationHeaders },
+    host: "0.0.0.0",
+    port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
+    allowedHosts: true, // מאפשר לכתובת של Render לגשת לשרת הפיתוח בהצלחה
   },
   preview: {
     headers: { ...isolationHeaders },
   },
-
-    server: {
-    host: '0.0.0.0',
-    port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
-    allowedHosts: true // מאפשר לכתובת של Render לגשת לשרת הפיתוח בהצלחה
-  }
-  
 });
